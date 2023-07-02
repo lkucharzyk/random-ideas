@@ -1,7 +1,10 @@
 const express = require('express');
-
-const port = 5000;
+require('dotenv').config();
+const port = process.env.PORT || 500;
+const connectDB = require('./config/db')
 const app = express();
+
+connectDB();
 
 //body parser middleware
 

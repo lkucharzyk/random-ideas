@@ -2,7 +2,8 @@ import axios from 'axios'
 
 class IdeasAPI{
     constructor(){
-        this.apiUrl = 'http://localhost:5000/api/ideas'
+        //this.apiUrl = 'http://localhost:5000/api/ideas'
+        this.apiUrl = '/api/ideas'
     }
 
     getIdeas(){
@@ -17,7 +18,7 @@ class IdeasAPI{
         return axios.put(`${this.apiUrl}/${id}`, data)
     }
 
-    deleteIdea(id){
+    delteIdea(id){
         const username = localStorage.getItem('username') ? localStorage.getItem('username') :'';
         return axios.delete(`${this.apiUrl}/${id}`,{
             data: {

@@ -1,3 +1,4 @@
+import e from "cors";
 import IdeasAPI from "../services/ideasAPI";
 
 class IdeaList{
@@ -15,6 +16,17 @@ class IdeaList{
           this._validTags.add('inventions');
     }
 
+    addEventListeners(){
+      this._ideaListEL.addEventListener('click', e =>{
+        if(e.target.classList.contains('fa-times')){
+          e.stopImmediatePropagation();
+          const IdeaId = e.target.parentElement.parentElement.dataset.id;
+          this.deleteIdea(IdeaId);
+
+        }
+      })
+    }
+
    async getIdeas(){
       try {
         const res = await IdeasAPI.getIdeas();
@@ -23,6 +35,23 @@ class IdeaList{
       } catch (error) {
         console.log(error);
       }
+    }
+
+    async deleteIdea(ideaId){
+      try {
+        //server
+        const res = await IdeasAPI.deleteIdea(ideaId)
+        //DOM
+        this.ideas.filter(idea => idea.id !== ideaId);
+        this.getIdeas();
+      } catch (error) {
+        alert('cnt dlt')
+      }
+    }
+
+    addIdeaToList(idea){
+      this.ideas.push(idea);
+      this.redner();
     }
     
     getTagClass(tag){
@@ -37,8 +66,8 @@ class IdeaList{
     redner(){
         this._ideaListEL.innerHTML = this.ideas.map((idea => {
             const tagClass = this.getTagClass(idea.tag);
-            return ` <div class="card">
-            <button class="delete"><i class="fas fa-times"></i></button>
+            return ` <div class="card" data-id="${idea._id}">
+            ${idea.username === localStorage.getItem('username') ? '<button class="delete"><i class="fas fa-times"></i></button>' : '' }
             <h3>
               ${idea.text}
             </h3>
@@ -48,7 +77,8 @@ class IdeaList{
               <span class="author">${idea.username}</span>
             </p>
           </div>`
-        })).join('')
+        })).join('');
+        this.addEventListeners();
     }
 }
 export default IdeaList

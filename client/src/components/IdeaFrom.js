@@ -1,21 +1,39 @@
+import ideasAPI from "../services/ideasAPI";
+import IdeaList from "./ideaList";
+
 class IdeaForm{
     constructor(){
         this._formModal = document.querySelector('#form-modal');
-       
+        this.ideaList = new IdeaList;
     }
+    
 
     addEventListeners(){
         this._form.addEventListener('submit', this.handleSubmit.bind(this));
     }
 
-    handleSubmit(e){
+   
+    async handleSubmit(e){
         e.preventDefault();
+        if(!this._form.elements.text.value || !this._form.elements.tag.value || !this._form.elements.username.value){
+          alert('Please enter fields')
+          return;
+        }
+        
+        localStorage.setItem('username', this._form.elements.username.value)
+
         const idea = {
             text: this._form.elements.text.value,
             tag: this._form.elements.tag.value,
-            user: this._form.elements.username.value
+            username: this._form.elements.username.value
         }
+
+        const newIdea = await ideasAPI.createIdea(idea);
+        this.ideaList.addIdeaToList(newIdea.data.data);
+
         Array.from(this._form.elements).forEach(element => element.value = '');
+
+        this.render()
 
         document.dispatchEvent(new Event('clo'))
 
@@ -25,7 +43,7 @@ class IdeaForm{
         this._formModal.innerHTML =`<form id="idea-form">
         <div class="form-control">
           <label for="idea-text">Enter a Username</label>
-          <input type="text" name="username" id="username" />
+          <input type="text" name="username" id="username" value="${localStorage.getItem('username') ? localStorage.getItem('username') : ''}"/>
         </div>
         <div class="form-control">
           <label for="idea-text">What's Your Idea?</label>

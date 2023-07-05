@@ -47,18 +47,25 @@ router.post('/', async (req, res) =>{
 //update idea
 
 router.put('/:id', async (req, res)=>{
- try {
-  const idea = await Idea.findByIdAndUpdate(
+  try {
+
+  const idea =  await Idea.findById(req.params.id);
+
+  if(idea.username === req.body.username){
+    const upIdea = await Idea.findByIdAndUpdate(
     req.params.id,
-    {
-      $set : {
-        text: req.body.text,
-        tag : req.body.tag
-      }
-    },
-      {new: true} // jeśli nie znajdzie id, stworzy nową ideę
-  );
-  res.json({sucess: true, data: idea})
+      {
+        $set : {
+          text: req.body.text,
+          tag : req.body.tag
+        }
+      },
+        {new: true} // jeśli nie znajdzie id, stworzy nową ideę
+    );
+    return res.json({sucess: true, data: upIdea})
+  }
+  res.status(403).json({sucess:false, error: 'non valid username'})
+  
  } catch (error) {
     console.log(error);
     res.status(500).json({sucess:false, error: ':c'})
@@ -69,8 +76,14 @@ router.put('/:id', async (req, res)=>{
 
 router.delete('/:id', async (req, res)=>{
   try {
-    await Idea.findByIdAndDelete(req.params.id);
-    res.json({sucess: true, data: {}})
+
+    const idea =  await Idea.findById(req.params.id);
+    if(idea.username === req.body.username){
+      await Idea.findByIdAndDelete(req.params.id);
+      return res.json({sucess: true, data: {}})
+    }
+    res.status(403).json({sucess:false, error: 'non valid username'})
+
    } catch (error) {
       console.log(error);
       res.status(500).json({sucess:false, error: ':c'})
